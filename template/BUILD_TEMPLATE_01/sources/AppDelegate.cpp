@@ -66,39 +66,12 @@ bool AppDelegate::applicationDidFinishLaunching()
     // CCBReader
     tolua_extensions_ccb_open(L);
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    string path = CCFileUtils::sharedFileUtils()->fullPathForFilename("scripts/main.lua");
-#else
-    string path = CCFileUtils::sharedFileUtils()->fullPathForFilename(getStartupScriptFilename().c_str());
-#endif
+    // load scripts
+    const path = CCFileUtils::sharedFileUtils()->fullPathForFilename("res/scripts.zip");
+    pStack->loadChunksFromZip(path.c_str());
 
-    int pos;
-    while ((pos = path.find_first_of("\\")) != std::string::npos)
-    {
-        path.replace(pos, 1, "/");
-    }
-    size_t p = path.find_last_of("/\\");
-    if (p != path.npos)
-    {
-        const string dir = path.substr(0, p);
-        pStack->addSearchPath(dir.c_str());
-
-        p = dir.find_last_of("/\\");
-        if (p != dir.npos)
-        {
-            pStack->addSearchPath(dir.substr(0, p).c_str());
-        }
-    }
-
-    string env = "__LUA_STARTUP_FILE__=\"";
-    env.append(path);
-    env.append("\"");
-    pEngine->executeString(env.c_str());
-
-    CCLOG("------------------------------------------------");
-    CCLOG("LOAD LUA FILE: %s", path.c_str());
-    CCLOG("------------------------------------------------");
-    pEngine->executeScriptFile(path.c_str());
+    // run scripts
+    pStack->executeString("require \"main\"");
 
     return true;
 }
