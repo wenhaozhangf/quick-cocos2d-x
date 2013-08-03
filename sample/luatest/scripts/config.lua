@@ -12,12 +12,4 @@ CONFIG_SCREEN_ORIENTATION = "landscape"
 CONFIG_SCREEN_AUTOSCALE = "FIXED_HEIGHT"
 
 -- app information
-CONFIG_APP_PACKAGE_NAME = "com.quick-x.sample.iap4ios"
-CONFIG_PLATFORM_RESTRICT = "ios"
-
--- IAP Products ID
-STORE_PRODUCTS_ID = {
-    "com.quick-x.sample.iap4ios.product01",
-    "com.quick-x.sample.iap4ios.product02",
-    "com.quick-x.sample.iap4ios.product03",
-}
+CONFIG_APP_PACKAGE_NAME = "com.quick-x.sample.luatest"

@@ -1,23 +1,36 @@
 <?php
 
-require(__DIR__ . '/project_functions.php');
+require_once(__DIR__ . '/project_builder/functions.php');
+require_once(__DIR__ . '/project_builder/ProjectConfig.php');
+require_once(__DIR__ . '/project_builder/ProjectBuilder.php');
 
 function help()
 {
     echo <<<EOT
 
-usage: build_project [options] project_path package_name
+usage: build_project -c channel [options] [project_path]
 
-options:
-    -p platform, eg: -p ios,android
-    -o screen orientation, eg: -o landscape . default is portrait
-    -t template root path, eg: -t /quick-cocos2d-x/template/BUILD_TEMPLATE_01
+optional:
+    -p package_name, eg: com.quick-x.sample.benchmark
+       if not specified, read package_name from build.json
 
-    package name, eg: com.quickx.games.physics
+    -t channel templates path, eg: -l /my_channels/
+       if not specified, use default path (\$QUICK_COCOS2DX_ROOT/template/)
+       default template includes: general.ios, general.android
+
+    project_path, eg: /my_games/game01/
+       if not specified, use current directory
+
+required:
+    -c channel, eg: -c general.ios
+       specify channel used for build
 
 examples:
 
-    build_project -p ios benchmark com.quickx.sample.benchmark
+    $ cd benchmark
+    $ build_project -c general.ios -p com.quickx.sample.benchmark
+
+    build project with \$QUICK_COCOS2DX_ROOT/template/general.ios.build
 
 
 
@@ -25,7 +38,7 @@ EOT;
 
 }
 
-if ($argc < 2)
+if ($argc < 4)
 {
     help();
     exit(1);
@@ -37,7 +50,7 @@ $config = array(
     'orientation'  => 'portrait',
     'templatePath' => '',
     'packageName'  => '',
-    'platform'     => 'ios,android',
+    'platform'     => '',
     'projectPath'  => '',
 );
 
