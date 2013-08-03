@@ -271,7 +271,7 @@ CCPhysicsBody *CCPhysicsWorld::getBodyByCpBody(cpBody *cpBody)
 
 void CCPhysicsWorld::start(void)
 {
-    scheduleUpdate();
+    scheduleUpdateWithPriority(kCCPrioritySystem);
 }
 
 void CCPhysicsWorld::stop(void)
@@ -365,7 +365,7 @@ void CCPhysicsWorld::step(float dt)
 
 void CCPhysicsWorld::update(float dt)
 {
-    step(m_stepInterval);
+    step(dt);
 }
 
 void CCPhysicsWorld::onExit(void)
