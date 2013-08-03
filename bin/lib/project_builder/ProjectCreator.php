@@ -1,20 +1,18 @@
 <?php
 
-require_once(__DIR__ . '/ProjectConfig.php');
+require_once(__DIR__ . '/ProjectCreatorConfig.php');
 
 
 class ProjectCreator
 {
     private $projectConfig;
     private $projectPath;
-    private $noproj;
 
     function __construct(array $config)
     {
-        $this->projectConfig = new ProjectConfig($config);
+        $this->projectConfig = new ProjectCreatorConfig($config);
 
         $force = $config['force'];
-        $this->noproj = $config['noproj'];
 
         // check projectName
         if (isset($this->projectConfig->vars['__PROJECT_PACKAGE_LAST_NAME_L__']))
@@ -24,11 +22,10 @@ class ProjectCreator
 
         if (!$force && (is_dir($this->projectPath) || file_exists($this->projectPath)))
         {
+            $this->projectConfig->ready = false;
             printf("ERROR: project path \"%s\" exists\n", $this->projectPath);
             return;
         }
-
-
     }
 
     function run()
@@ -60,8 +57,6 @@ EOT;
         {
             $sourceFilename = substr($sourcePath, strlen($this->projectConfig->templatePath));
             if ($sourceFilename == 'TEMPLATE_INFO.json') continue;
-            if ($this->noproj && substr($sourceFilename, 0, 5) == 'proj.') continue;
-            if ($this->noproj && substr($sourceFilename, 0, 8) == 'sources/') continue;
             if (!$this->copyFile($sourcePath, $sourceFilename)) return false;
         }
 

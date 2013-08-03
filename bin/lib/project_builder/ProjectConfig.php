@@ -2,7 +2,6 @@
 
 class ProjectConfig
 {
-    public $templatePath;
     public $packageName;
     public $packageFullName;
     public $packageLastName;
@@ -12,28 +11,6 @@ class ProjectConfig
 
     function __construct(array $config)
     {
-        // check template
-        $templatePath = rtrim($config['templatePath'], "/\\") . DS;
-        if (!is_dir($templatePath))
-        {
-            printf("ERROR: invalid template path \"%s\"\n", $templatePath);
-            return;
-        }
-        if (!file_exists($templatePath . 'TEMPLATE_INFO.json'))
-        {
-            printf("ERROR: not found TEMPLATE_INFO.json in template path \"%s\"\n", $templatePath);
-            return;
-        }
-        $info = file_get_contents($templatePath . 'TEMPLATE_INFO.json');
-        $info = json_decode($info, true);
-        if (!is_array($info) || empty($info['name']))
-        {
-            printf("ERROR: invalid TEMPLATE_INFO.json in template path \"%s\"\n", $templatePath);
-            return;
-        }
-
-        $this->templatePath = $templatePath;
-
         // check packageName
         $packageName = str_replace('-', '_', strtolower($config['packageName']));
         $parts = explode('.', $packageName);
@@ -66,7 +43,6 @@ class ProjectConfig
         $this->orientation = $orientation;
 
         // prepare contents
-        $this->vars['__TEMPLATE_PATH__'] = $this->templatePath;
         $this->vars['__PROJECT_PACKAGE_NAME__'] = $this->packageName;
         $this->vars['__PROJECT_PACKAGE_NAME_L__'] = strtolower($this->packageName);
         $this->vars['__PROJECT_PACKAGE_FULL_NAME__'] = $this->packageFullName;
@@ -100,5 +76,16 @@ class ProjectConfig
         }
 
         $this->ready = true;
+    }
+
+    function validate()
+    {
+        return $this->ready;
+    }
+
+    function dump()
+    {
+        print_r($this);
+        print("\n");
     }
 }

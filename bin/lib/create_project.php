@@ -1,24 +1,35 @@
 <?php
 
-require(__DIR__ . '/project_functions.php');
+require_once(__DIR__ . '/project_builder/functions.php');
+require_once(__DIR__ . '/project_builder/ProjectCreatorConfig.php');
+require_once(__DIR__ . '/project_builder/ProjectCreator.php');
 
 function help()
 {
     echo <<<EOT
 
-usage: create_project [options] package_name
+usage: create_project [options] -p package_name [project_parent_dir]
 
-options:
-    -f force copy files to project dir
-    -o screen orientation, eg: -o landscape . default is portrait
-    -t template path, eg: -t /quick-cocos2d-x/template/PROJECT_TEMPLATE_01
-    -noproj skip create projects
+optional:
+    -f force overwrite files exists in project directory
 
-    package name, eg: com.quickx.games.physics
+    -o screen orientation, eg: -o landscape
+       if not specified, default is portrait
+
+    -t project template path, eg: -t /my_template/
+       if not specified, use default path (\$QUICK_COCOS2DX_ROOT/template/newproject.general/)
+
+    project_parent_dir, eg: /my_games/
+       if not specified, use current directory as project's parent directory
+
+required:
+    -p package_name, eg: com.quick-x.sample.benchmark
 
 examples:
 
-    create_project com.quickx.game.physics
+    $ create_project -p com.quickx.game.physics /mygames/
+
+    >>> create project in /mygames/physics/ ...
 
 
 
@@ -26,7 +37,7 @@ EOT;
 
 }
 
-if ($argc < 2)
+if ($argc < 3)
 {
     help();
     exit(1);
@@ -35,11 +46,11 @@ if ($argc < 2)
 array_shift($argv);
 
 $config = array(
-    'orientation'  => 'portrait',
-    'force'        => false,
     'templatePath' => '',
-    'packageName'  => '',
-    'noproj'       => false,
+    'orientation' => 'portrait',
+    'force' => false,
+    'packageName' => '',
+    'projectParentDir' => '',
 );
 
 do
@@ -58,17 +69,19 @@ do
     {
         $config['force'] = true;
     }
-    else if ($argv[0] == '-noproj')
+    else if ($argv[0] == '-p')
     {
-        $config['noproj'] = true;
+        $config['packageName'] = $argv[1];
+        array_shift($argv);
     }
-    else if ($config['packageName'] == '')
+    else
     {
-        $config['packageName'] = $argv[0];
+        $config['projectParentDir'] = $argv[0];
     }
 
     array_shift($argv);
 } while (count($argv) > 0);
+
 
 $creator = new ProjectCreator($config);
 if ($creator->run())

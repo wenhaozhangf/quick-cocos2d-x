@@ -8,7 +8,7 @@ function help()
 {
     echo <<<EOT
 
-usage: build_project -c channel [options] [project_path]
+usage: build_project [options] -c channel [project_path]
 
 optional:
     -p package_name, eg: com.quick-x.sample.benchmark
@@ -30,7 +30,7 @@ examples:
     $ cd benchmark
     $ build_project -c general.ios -p com.quickx.sample.benchmark
 
-    build project with \$QUICK_COCOS2DX_ROOT/template/general.ios.build
+    >>> build project with \$QUICK_COCOS2DX_ROOT/template/general.ios.build
 
 
 
