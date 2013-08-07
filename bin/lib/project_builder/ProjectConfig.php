@@ -6,6 +6,7 @@ class ProjectConfig
     public $packageFullName;
     public $packageLastName;
     public $orientation;
+    public $quiet;
     public $vars = array();
     public $ready = false;
 
@@ -41,6 +42,7 @@ class ProjectConfig
             return;
         }
         $this->orientation = $orientation;
+        $this->quiet = isset($config['quiet']) ? (bool)$config['quiet'] : false;
 
         // prepare contents
         $this->vars['__PROJECT_PACKAGE_NAME__'] = $this->packageName;

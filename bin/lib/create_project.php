@@ -1,14 +1,13 @@
 <?php
 
 require_once(__DIR__ . '/project_builder/functions.php');
-require_once(__DIR__ . '/project_builder/ProjectCreatorConfig.php');
 require_once(__DIR__ . '/project_builder/ProjectCreator.php');
 
 function help()
 {
     echo <<<EOT
 
-usage: create_project [options] -p package_name [project_parent_dir]
+usage: create_project [options] -p package_name [project_parent_dir] [project_directory_name]
 
 optional:
     -f force overwrite files exists in project directory
@@ -21,6 +20,9 @@ optional:
 
     project_parent_dir, eg: /my_games/
        if not specified, use current directory as project's parent directory
+
+    project_directory_name, eg: game01
+       if not specified, use last in package name
 
 required:
     -p package_name, eg: com.quick-x.sample.benchmark
@@ -51,6 +53,7 @@ $config = array(
     'force' => false,
     'packageName' => '',
     'projectParentDir' => '',
+    'projectDirectoryName' => '',
 );
 
 do
@@ -74,9 +77,13 @@ do
         $config['packageName'] = $argv[1];
         array_shift($argv);
     }
-    else
+    else if (empty($config['projectParentDir']))
     {
         $config['projectParentDir'] = $argv[0];
+    }
+    else
+    {
+        $config['projectDirectoryName'] = $argv[0];
     }
 
     array_shift($argv);

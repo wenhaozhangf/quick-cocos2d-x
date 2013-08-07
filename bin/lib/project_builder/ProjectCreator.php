@@ -1,12 +1,13 @@
 <?php
 
+require_once(__DIR__ . '/functions.php');
 require_once(__DIR__ . '/ProjectCreatorConfig.php');
 
 
 class ProjectCreator
 {
-    private $projectConfig;
-    private $projectPath;
+    public $projectConfig;
+    public $projectPath;
 
     function __construct(array $config)
     {
@@ -15,10 +16,20 @@ class ProjectCreator
         $force = $config['force'];
 
         // check projectName
-        if (isset($this->projectConfig->vars['__PROJECT_PACKAGE_LAST_NAME_L__']))
+        $projectParentDir = trim($config['projectParentDir']);
+        if (empty($projectParentDir))
         {
-            $this->projectPath = rtrim(getcwd(), '/\\') . DS . $this->projectConfig->vars['__PROJECT_PACKAGE_LAST_NAME_L__'] . DS;
+            $projectParentDir = getcwd();
         }
+        $projectParentDir = rtrim($projectParentDir, '/\\');
+
+        $projectDirectoryName = trim($config['projectDirectoryName']);
+        if (empty($projectDirectoryName))
+        {
+            $projectDirectoryName = $this->projectConfig->vars['__PROJECT_PACKAGE_LAST_NAME_L__'];
+        }
+
+        $this->projectPath = $projectParentDir . DS . $projectDirectoryName;
 
         if (!$force && (is_dir($this->projectPath) || file_exists($this->projectPath)))
         {
@@ -75,9 +86,12 @@ EOT;
             $destinationFilename = str_replace($key, $value, $destinationFilename);
         }
 
-        printf("create file \"%s\" ... ", $destinationFilename);
+        if (!$this->projectConfig->quiet)
+        {
+            printf("create file \"%s\" ... ", $destinationFilename);
+        }
         $dirname = pathinfo($destinationFilename, PATHINFO_DIRNAME);
-        $destinationDir = $this->projectPath . $dirname;
+        $destinationDir = $this->projectPath . DS . $dirname;
 
         if (!is_dir($destinationDir))
         {
@@ -89,7 +103,7 @@ EOT;
             return false;
         }
 
-        $destinationPath = $this->projectPath . $destinationFilename;
+        $destinationPath = $this->projectPath . DS . $destinationFilename;
         $contents = file_get_contents($sourcePath);
         if ($contents == false)
         {
@@ -110,7 +124,10 @@ EOT;
         }
         chmod($destinationPath, $stat['mode']);
 
-        printf("OK\n");
+        if (!$this->projectConfig->quiet)
+        {
+            printf("OK\n");
+        }
         return true;
     }
 }

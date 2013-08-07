@@ -1,7 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/project_builder/functions.php');
-require_once(__DIR__ . '/project_builder/ProjectConfig.php');
 require_once(__DIR__ . '/project_builder/ProjectBuilder.php');
 
 function help()
@@ -12,7 +10,7 @@ usage: build_project [options] -c channel [project_path]
 
 optional:
     -p package_name, eg: com.quick-x.sample.benchmark
-       if not specified, read package_name from build.json
+       if not specified, read from scripts/config.lua
 
     -t channel templates path, eg: -l /my_channels/
        if not specified, use default path (\$QUICK_COCOS2DX_ROOT/template/)
@@ -28,7 +26,7 @@ required:
 examples:
 
     $ cd benchmark
-    $ build_project -c general.ios -p com.quickx.sample.benchmark
+    $ build_project -c general.ios -p com.quick-x.sample.benchmark
 
     >>> build project with \$QUICK_COCOS2DX_ROOT/template/general.ios.build
 
@@ -38,7 +36,7 @@ EOT;
 
 }
 
-if ($argc < 4)
+if ($argc < 3)
 {
     help();
     exit(1);
@@ -47,67 +45,45 @@ if ($argc < 4)
 array_shift($argv);
 
 $config = array(
-    'orientation'  => 'portrait',
-    'templatePath' => '',
     'packageName'  => '',
-    'platform'     => '',
+    'templatesPath' => '',
+    'channel' => '',
     'projectPath'  => '',
+    'orientation' => '',
 );
 
 do
 {
+    if ($argv[0] == '-p')
+    {
+        $config['packageName'] = $argv[1];
+        array_shift($argv);
+    }
     if ($argv[0] == '-t')
     {
-        $config['templatePath'] = $argv[1];
+        $config['templatesPath'] = $argv[1];
         array_shift($argv);
     }
-    else if ($argv[0] == '-o')
+    else if ($argv[0] == '-c')
     {
-        $config['orientation'] = $argv[1];
-        array_shift($argv);
-    }
-    elseif ($argv[0] == '-p')
-    {
-        $config['platform'] = $argv[1];
+        $config['channel'] = $argv[1];
         array_shift($argv);
     }
     else if ($config['projectPath'] == '')
     {
         $config['projectPath'] = $argv[0];
     }
-    else if ($config['packageName'] == '')
-    {
-        $config['packageName'] = $argv[0];
-    }
 
     array_shift($argv);
 } while (count($argv) > 0);
 
 // check project path
-$path = $config['projectPath'];
-if (substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':')
+$projectPath = $config['projectPath'];
+if (substr($projectPath, 0, 1) != '/' && substr($projectPath, 1, 1) != ':')
 {
-    $path = rtrim(getcwd(), '/\\') . DS . $path;
+    $projectPath = rtrim(getcwd(), '/\\') . DS . $projectPath;
 }
-$config['projectPath'] = realpath($path);
-
-if (is_dir($path))
-{
-    // read build settings
-    $jsonString = @file_get_contents($path . DS . 'build.json');
-    if ($jsonString)
-    {
-        $json = json_decode($jsonString, true);
-        if ($config['orientation'] == '' && isset($json['orientation']) && $json['orientation'] != '')
-        {
-            $config['orientation'] = $json['orientation'];
-        }
-        if ($config['packageName'] == '' && isset($json['packageName']) && $json['packageName'] != '')
-        {
-            $config['packageName'] = $json['packageName'];
-        }
-    }
-}
+$config['projectPath'] = realpath($projectPath);
 
 $builder = new ProjectBuilder($config);
 if ($builder->run())

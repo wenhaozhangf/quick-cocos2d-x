@@ -1,7 +1,10 @@
 <?php
 
-require_once(__DIR__ . '/ProjectConfig.php');
+require_once(__DIR__ . '/functions.php');
+require_once(__DIR__ . '/ProjectBuilderConfig.php');
 require_once(__DIR__ . '/ProjectCreator.php');
+require_once(__DIR__ . '/LuaPackager.php');
+
 
 /*
 
@@ -68,76 +71,131 @@ Options:
 
 class ProjectBuilder
 {
-    private $projectConfig;
-    private $projectPath;
-    private $config;
+    public $projectConfig;
+    public $config;
 
     function __construct(array $config)
     {
-        $this->config = $config;
-        $this->projectConfig = new ProjectConfig($config);
+        // read build settings
+        $projectPath = $config['projectPath'];
+        $readConfigFromScript = empty($config['orientation']) || empty($config['packageName']);
+        $scriptConfigPath = $projectPath . DS . 'scripts' . DS . 'config.lua';
+        $scriptConfigIsExists = file_exists($scriptConfigPath);
 
-        if ($this->projectConfig->ready)
+        if ($readConfigFromScript)
         {
-            // check projectName
-            $this->projectPath = $config['projectPath'];
-            if (!is_dir($this->projectPath))
+            if (!$scriptConfigIsExists)
             {
-                printf("ERROR: invalid project path \"%s\"\n", $this->projectPath);
+                printf("ERROR: can't read config from script file\n");
+                $this->projectConfig->ready = false;
+                return;
+            }
+
+            $lines = file($scriptConfigPath);
+            foreach ($lines as $line)
+            {
+                if (empty($config['orientation']))
+                {
+                    $value = getValueByKey('CONFIG_SCREEN_ORIENTATION', $line);
+                    if (!empty($value))
+                    {
+                        $config['orientation'] = $value;
+                        continue;
+                    }
+                }
+
+                if (empty($config['packageName']))
+                {
+                    $value = getValueByKey('CONFIG_APP_PACKAGE_NAME', $line);
+                    if (!empty($value))
+                    {
+                        $config['packageName'] = $value;
+                        continue;
+                    }
+                }
+
+                $readConfigFromScript = empty($config['orientation']) || empty($config['packageName']);
+                if (!$readConfigFromScript) break;
             }
         }
+
+        $this->projectConfig = new ProjectBuilderConfig($config);
+        $this->config = $config;
+        $this->config['templatePath'] = $this->projectConfig->channelPath;
+        $this->config['projectParentDir'] = $this->projectConfig->projectPath . DS . 'tmp';
+        $this->config['projectDirectoryName'] = 'build.' . $this->projectConfig->channel;
+        $this->config['force'] = true;
+        $this->config['quiet'] = true;
     }
 
     function run()
     {
         if (!$this->projectConfig->ready) return false;
 
-        // change current dir to tmp
-        $tempDir = $this->projectPath . DS . 'build';
-        if (!file_exists($tempDir) && !mkdir($tempDir))
+        // change current directory to tmp
+        $tempDir = $this->projectConfig->projectPath . DS . 'tmp';
+        if (!is_dir($tempDir) && !mkdir($tempDir))
         {
             printf("ERROR: can't create temp dir \"%s\"\n", $tempDir);
             return false;
         }
         chdir($tempDir);
-        $this->config['force'] = true;
-        $this->config['noproj'] = false;
+
+        // cleanup
+        $buildProjectPath = $this->config['projectParentDir'] . DS . $this->config['projectDirectoryName'];
+        $files = getPathsWithDirectory($buildProjectPath);
+        foreach ($files as $path)
+        {
+            if (is_file($path))
+            {
+                unlink($path);
+            }
+            else
+            {
+                rmdir($path);
+            }
+        }
+        if (is_dir($buildProjectPath)) rmdir($buildProjectPath);
+
+        // create build project
         $creator = new ProjectCreator($this->config);
         $ret = $creator->run();
-
         if (!$ret)
         {
-            rmdir($tempDir);
             return false;
         }
 
-        $destDir = $tempDir . DS . $this->projectConfig->vars['__PROJECT_PACKAGE_LAST_NAME_L__'];
-        $destResDir = $destDir . DS . 'res';
-        if (!file_exists($destResDir) && !mkdir($destResDir))
+        // compile scripts to zip
+        $buildProjectAssetsPath = $creator->projectPath . DS . 'assets';
+        mkdir($buildProjectAssetsPath);
+        $buildProjectResPath = $buildProjectAssetsPath . DS . 'res';
+        if (!is_dir($buildProjectResPath) && !mkdir($buildProjectResPath))
         {
-            printf("ERROR: can't create dest res dir \"%s\"\n", $destResDir);
+            printf("ERROR: can't create temp dir \"%s\"\n", $buildProjectResPath);
             return false;
         }
 
-        printf("\n");
+        $scriptsZipPath = $buildProjectResPath . DS . 'scripts';
+        $packagerConfig = array(
+            'packageName'        => '',
+            'excludes'           => array(),
+            'srcdir'             => $this->projectConfig->projectPath . DS . 'scripts',
+            'zip'                => true,
+            'suffixName'         => 'zip',
+            'quiet'              => true,
+        );
+        $packager = new LuaPackager($packagerConfig);
+        $packager->dumpZip($scriptsZipPath);
 
-        $len = strlen($this->projectPath) + 1;
-        $paths = getPaths($destResDir);
-        foreach ($paths as $path)
-        {
-            printf("remove exists file %s\n", substr($path, $len));
-            unlink($path);
-        }
-        printf("\n");
-
-        $srcs = getPaths($this->projectPath . DS . 'res');
-        foreach ($srcs as $src)
-        {
-            $filename = substr($src, $len);
-            $destPath = $destDir . DS . $filename;
-            printf("copy file %s\n", substr($destPath, $len));
-            copy($src, $destPath);
-        }
+        // copy assets
+//        $srcs = getPaths($this->projectPath . DS . 'res');
+//        foreach ($srcs as $src)
+//        {
+//            $filename = substr($src, $len);
+//            $destPath = $destDir . DS . $filename;
+//            printf("copy file %s\n", substr($destPath, $len));
+//            copy($src, $destPath);
+//        }
 
         return true;
     }
