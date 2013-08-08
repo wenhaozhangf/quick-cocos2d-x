@@ -142,6 +142,8 @@ class ProjectBuilder
         chdir($tempDir);
 
         // cleanup
+        printf("\n");
+        printf("- cleanup\n");
         $buildProjectPath = $this->config['projectParentDir'] . DS . $this->config['projectDirectoryName'];
         $files = getPathsWithDirectory($buildProjectPath);
         foreach ($files as $path)
@@ -158,6 +160,7 @@ class ProjectBuilder
         if (is_dir($buildProjectPath)) rmdir($buildProjectPath);
 
         // create build project
+        printf("- create build project\n");
         $creator = new ProjectCreator($this->config);
         $ret = $creator->run();
         if (!$ret)
@@ -166,6 +169,7 @@ class ProjectBuilder
         }
 
         // compile scripts to zip
+        printf("- compile scripts to zip\n");
         $buildProjectAssetsPath = $creator->projectPath . DS . 'assets';
         mkdir($buildProjectAssetsPath);
         $buildProjectResPath = $buildProjectAssetsPath . DS . 'res';
@@ -188,6 +192,7 @@ class ProjectBuilder
         $packager->dumpZip($scriptsZipPath);
 
         // copy assets
+        printf("- copy assets files\n");
 //        $srcs = getPaths($this->projectPath . DS . 'res');
 //        foreach ($srcs as $src)
 //        {
@@ -196,6 +201,9 @@ class ProjectBuilder
 //            printf("copy file %s\n", substr($destPath, $len));
 //            copy($src, $destPath);
 //        }
+
+        printf("- update build project\n");
+        printf("- build\n");
 
         return true;
     }

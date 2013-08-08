@@ -43,7 +43,9 @@ class ProjectCreator
     {
         if (!$this->projectConfig->ready) return false;
 
-        echo <<<EOT
+        if (!$this->projectConfig->quiet)
+        {
+            echo <<<EOT
 
 template            : {$this->projectConfig->templatePath}
 
@@ -53,6 +55,7 @@ screen orientation  : {$this->projectConfig->orientation}
 
 
 EOT;
+        }
 
         // create project dir
         if (!is_dir($this->projectPath)) mkdir($this->projectPath);

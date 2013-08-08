@@ -19,6 +19,8 @@
 // CCBReader
 #include "Lua_extensions_CCB.h"
 
+__LOAD_MORE_LUABINDING_INCLUDES__
+
 using namespace std;
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -66,12 +68,38 @@ bool AppDelegate::applicationDidFinishLaunching()
     // CCBReader
     tolua_extensions_ccb_open(L);
 
-    // load scripts
-    const path = CCFileUtils::sharedFileUtils()->fullPathForFilename("res/scripts.zip");
-    pStack->loadChunksFromZip(path.c_str());
+    __LOAD_MORE_LUABINDING_OPEN__
 
-    // run scripts
-    pStack->executeString("require \"main\"");
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    pStack->loadChunksFromZip(CCFileUtils::sharedFileUtils()->fullPathForFilename("data/framework_precompiled.zip").c_str());
+    pStack->loadChunksFromZip(CCFileUtils::sharedFileUtils()->fullPathForFilename("data/game.zip").c_str());
+    CCLOG("------------------------------------------------");
+    CCLOG("REQUIRE LUA MODULE: main");
+    CCLOG("------------------------------------------------");
+    pEngine->executeString("require(\"main\")");
+#else
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    const string path = CCFileUtils::sharedFileUtils()->fullPathForFilename("scripts/main.lua");
+#else
+    const string path = CCFileUtils::sharedFileUtils()->fullPathForFilename(getStartupScriptFilename().c_str());
+#endif
+    size_t p = path.find_last_of("/\\");
+    if (p != path.npos)
+    {
+        const string dir = path.substr(0, p);
+        pStack->addSearchPath(dir.c_str());
+    }
+
+    string env = "__LUA_STARTUP_FILE__=\"";
+    env.append(path);
+    env.append("\"");
+    pEngine->executeString(env.c_str());
+
+    CCLOG("------------------------------------------------");
+    CCLOG("LOAD LUA FILE: %s", path.c_str());
+    CCLOG("------------------------------------------------");
+    pEngine->executeScriptFile(path.c_str());
+#endif
 
     return true;
 }
