@@ -156,7 +156,7 @@ function MainScene:updateFrame(dt)
     self.frame = self.frame + 1
     if self.frame % 5 == 0 then -- 更新top bar文字
         local str = "Object=%d FPS=%0.2f DT=%0.6f (Touch top bar to increase object) - Version %s"
-        self.label:setString(format(str, self.playerNode:getChildrenCount(), 1 / dt, dt, self.VERSION))
+        self.label:setString(string.format(str, self.playerNode:getChildrenCount(), 1 / dt, dt, self.VERSION))
         self.label:setPosition(display.cx, display.top - 10)
     end
 

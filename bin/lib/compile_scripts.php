@@ -2,7 +2,6 @@
 
 require_once(__DIR__ . '/project_builder/LuaPackager.php');
 
-
 function help()
 {
     echo <<<EOT

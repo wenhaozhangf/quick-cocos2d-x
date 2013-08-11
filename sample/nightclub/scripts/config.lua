@@ -20,13 +20,3 @@ MUSIC = {
 
 -- effects
 EFFECT = {}
-
--- preload all musics
-for k, v in pairs(MUSIC) do
-    audio.preloadMusic(v)
-end
-
--- preload all effects
-for k, v in pairs(EFFECT) do
-    audio.preloadEffect(v)
-end
