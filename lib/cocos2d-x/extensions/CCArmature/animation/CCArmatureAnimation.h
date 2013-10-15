@@ -27,16 +27,16 @@ THE SOFTWARE.
 #define __CCANIMATION_H__
 
 #include "CCProcessBase.h"
-#include "../external_tool/sigslot.h"
+// #include "../external_tool/sigslot.h"
 
 NS_CC_EXT_BEGIN
 
 
 enum MovementEventType
 {
-	START,
-	COMPLETE,
-	LOOP_COMPLETE
+    START,
+    COMPLETE,
+    LOOP_COMPLETE
 };
 
 
@@ -155,9 +155,9 @@ public:
      * MovementEvent signal. This will emit a signal when trigger a event.
      * The 1st param is the CCArmature. The 2nd param is Event Type, like START, COMPLETE. The 3rd param is Movement ID, also called Movement Name.
      */
-    sigslot::signal3<CCArmature *, MovementEventType, const char *> MovementEventSignal;
+    // sigslot::signal3<CCArmature *, MovementEventType, const char *> MovementEventSignal;
 
-    sigslot::signal2<CCBone *, const char *> FrameEventSignal;
+    // sigslot::signal2<CCBone *, const char *> FrameEventSignal;
 };
 
 NS_CC_EXT_END

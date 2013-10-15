@@ -36,23 +36,23 @@ CCFileUtils* CCFileUtils::sharedFileUtils()
 {
     if (s_sharedFileUtils == NULL)
     {
-        s_sharedFileUtils = new CCFileUtilsWin32();
+        s_sharedFileUtils = new CCFileUtilsQt();
         s_sharedFileUtils->init();
     }
     return s_sharedFileUtils;
 }
 
-CCFileUtilsWin32::CCFileUtilsWin32()
+CCFileUtilsQt::CCFileUtilsQt()
 {
 }
 
-bool CCFileUtilsWin32::init()
+bool CCFileUtilsQt::init()
 {
     m_strDefaultResRootPath = qApp->applicationDirPath().append('/').toLocal8Bit().constData();
     return CCFileUtils::init();
 }
 
-bool CCFileUtilsWin32::isFileExist(const std::string& strFilePath)
+bool CCFileUtilsQt::isFileExist(const std::string& strFilePath)
 {
     std::string strPath = strFilePath;
     if (!isAbsolutePath(strPath))
@@ -63,13 +63,18 @@ bool CCFileUtilsWin32::isFileExist(const std::string& strFilePath)
     return fileInfo.exists();
 }
 
-bool CCFileUtilsWin32::isAbsolutePath(const std::string& strPath)
+bool CCFileUtilsQt::isDirectoryExist(const std::string& strDirPath)
+{
+    return false;
+}
+
+bool CCFileUtilsQt::isAbsolutePath(const std::string& strPath)
 {
     QFileInfo fileInfo(strPath.c_str());
     return fileInfo.isAbsolute();
 }
 
-string CCFileUtilsWin32::getWritablePath()
+string CCFileUtilsQt::getWritablePath()
 {
     std::string ret(qApp->applicationDirPath().toLocal8Bit().constData());
     return ret;

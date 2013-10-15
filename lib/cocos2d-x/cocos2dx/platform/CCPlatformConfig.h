@@ -136,6 +136,14 @@ Config of cocos2d-x project, per target platform.
 #if defined(CC_TARGET_QT)
 #undef CC_TARGET_PLATFORM
 #define CC_TARGET_PLATFORM         CC_PLATFORM_QT
+#include <QtCore/qglobal.h>
+
+#if defined(COCOS2DX_LIBRARY)
+#  define COCOS2DXSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define COCOS2DXSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -145,10 +153,10 @@ Config of cocos2d-x project, per target platform.
 // check user set platform
 #if ! CC_TARGET_PLATFORM
     #error  "Cannot recognize the target platform; are you targeting an unsupported platform?"
-#endif 
+#endif
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-#pragma warning (disable:4127)  
+#pragma warning (disable:4127)
 #endif  // CC_PLATFORM_WIN32
 
 #endif  // __CC_PLATFORM_CONFIG_H__

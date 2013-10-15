@@ -6,7 +6,7 @@
 
 NS_CC_BEGIN
 
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID)
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID && CC_TARGET_PLATFORM != CC_PLATFORM_QT)
 
 static char logbuff[sizeof(char) * (kMaxLogLen + 1)];
 

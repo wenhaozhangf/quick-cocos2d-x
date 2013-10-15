@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "../utils/CCConstValue.h"
 #include "../datas/CCDatas.h"
 
-
 NS_CC_EXT_BEGIN
 
 CCArmatureAnimation *CCArmatureAnimation::create(CCArmature *armature)
@@ -47,8 +46,8 @@ CCArmatureAnimation *CCArmatureAnimation::create(CCArmature *armature)
 
 
 CCArmatureAnimation::CCArmatureAnimation()
-	: m_pAnimationData(NULL)
-	, m_pArmature(NULL)
+    : m_pAnimationData(NULL)
+    , m_pArmature(NULL)
     , m_strMovementID("")
     , m_iToIndex(0)
 {
@@ -260,7 +259,7 @@ void CCArmatureAnimation::updateHandler()
             {
                 m_iNextFrameIndex = m_iDurationTween;
 
-                MovementEventSignal.emit(m_pArmature, START, m_strMovementID.c_str());
+                //MovementEventSignal.emit(m_pArmature, START, m_strMovementID.c_str());
 
                 break;
             }
@@ -272,7 +271,7 @@ void CCArmatureAnimation::updateHandler()
             m_fCurrentPercent = 1;
             m_bIsComplete = true;
 
-            MovementEventSignal.emit(m_pArmature, COMPLETE, m_strMovementID.c_str());
+            //MovementEventSignal.emit(m_pArmature, COMPLETE, m_strMovementID.c_str());
         }
         break;
         case ANIMATION_TO_LOOP_FRONT:
@@ -282,7 +281,7 @@ void CCArmatureAnimation::updateHandler()
             m_fCurrentFrame = fmodf(m_fCurrentFrame, m_iNextFrameIndex);
             m_iNextFrameIndex = m_iDurationTween > 0 ? m_iDurationTween : 1;
 
-            MovementEventSignal.emit(m_pArmature, START, m_strMovementID.c_str());
+            //MovementEventSignal.emit(m_pArmature, START, m_strMovementID.c_str());
         }
         break;
         default:
@@ -291,7 +290,7 @@ void CCArmatureAnimation::updateHandler()
             m_fCurrentFrame = fmodf(m_fCurrentFrame, m_iNextFrameIndex);
             m_iToIndex = 0;
 
-            MovementEventSignal.emit(m_pArmature, LOOP_COMPLETE, m_strMovementID.c_str());
+            //MovementEventSignal.emit(m_pArmature, LOOP_COMPLETE, m_strMovementID.c_str());
         }
         break;
         }

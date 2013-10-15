@@ -51,12 +51,12 @@ CCTween *CCTween::create(CCBone *bone)
 CCTween::CCTween()
     : m_pMovementBoneData(NULL)
     , m_pTweenData(NULL)
-	, m_pFrom(NULL)
-	, m_pTo(NULL)
-	, m_pBetween(NULL)
-	, m_pCurrentKeyFrame(NULL)
+    , m_pFrom(NULL)
+    , m_pTo(NULL)
+    , m_pBetween(NULL)
+    , m_pCurrentKeyFrame(NULL)
     , m_pBone(NULL)
-    
+
     , m_eFrameTweenEasing(Linear)
     , m_iFromIndex(0)
     , m_iToIndex(0)
@@ -321,7 +321,7 @@ void CCTween::arriveKeyFrame(CCFrameData *keyFrameData)
 
         if(keyFrameData->m_strEvent.length() != 0)
         {
-            m_pAnimation->FrameEventSignal.emit(m_pBone, keyFrameData->m_strEvent.c_str());
+            // m_pAnimation->FrameEventSignal.emit(m_pBone, keyFrameData->m_strEvent.c_str());
         }
         // 		if(keyFrameData->m_strSound.length() != 0)
         // 		{

@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include "../utils/CCArmatureDefine.h"
 #include "CCDisplayFactory.h"
 #include "../datas/CCDatas.h"
-#include "../external_tool/sigslot.h"
-
+// #include "../external_tool/sigslot.h"
 
 #if ENABLE_PHYSICS_DETECT
 #include "../physics/CCColliderDetector.h"
@@ -37,7 +36,7 @@ THE SOFTWARE.
 
 NS_CC_EXT_BEGIN
 
-class  CCDecorativeDisplay: public CCObject, public sigslot::has_slots<>
+class  CCDecorativeDisplay: public CCObject /* , public sigslot::has_slots<> */
 {
 public:
     static CCDecorativeDisplay *create();

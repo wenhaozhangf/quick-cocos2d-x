@@ -27,6 +27,8 @@ THE SOFTWARE.
 
 #include <QMouseEvent>
 #include <QWidget>
+#include <QGLFunctions>
+#include <QGLShaderProgram>
 
 #include "CCStdC.h"
 #include "platform/CCCommon.h"
@@ -42,7 +44,7 @@ NS_CC_BEGIN
 class CCEGL;
 class CCTouch;
 
-class CC_DLL CCEGLView : public CCEGLViewProtocol
+class CC_DLL CCEGLView : public CCEGLViewProtocol, protected QGLFunctions
 {
 public:
     CCEGLView();
@@ -70,17 +72,17 @@ private:
 public:
 
     void resize(int width, int height);
-    /* 
+    /*
      * Set zoom factor for frame. This method is for debugging big resolution (e.g.new ipad) app on desktop.
      */
     void setFrameZoomFactor(float fZoomFactor);
-	float getFrameZoomFactor();
+    float getFrameZoomFactor();
     void centerWindow();
     void moveWindow(int left, int top);
 
     virtual void setViewPortInPoints(float x , float y , float w , float h);
     virtual void setScissorInPoints(float x , float y , float w , float h);
-    
+
     // static function
     /**
     @brief    get the shared main open gl window

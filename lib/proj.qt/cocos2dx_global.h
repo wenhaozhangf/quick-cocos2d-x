@@ -1,0 +1,5 @@
+#ifndef COCOS2DX_GLOBAL_H
+#define COCOS2DX_GLOBAL_H
+
+
+#endif // COCOS2DX_GLOBAL_H
